@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Travel Copilot — Design system (Modern Clarity + Warm Trust) */
+:root {
+  /* T-Bank: основной жёлтый (#FFDD2D), не оранжевый */
+  --color-primary: #FFDD2D;
+  --color-accent: #FFDD2D;
+  --color-safety: #6BA87C;
+  --color-caution: #F4C430;
+  --color-risk: #D84C4C;
+  /* Neutral */
+  --color-bg: #F8F7F5;
+  --color-surface: #FFFFFF;
+  --color-border: #E0D9D0;
+  /* Text */
+  --color-text: #2C2C2C;
+  --color-text-secondary: #6B6B6B;
+  --color-text-tertiary: #A0A0A0;
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  /* Motion */
+  --duration-fast: 0.2s;
+  --duration-normal: 0.4s;
+  --duration-slow: 0.6s;
+  --easing-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  /* T-Bank жёлтый (оригинал) */
+  --tbank-yellow: #FFDD2D;
+  --tbank-yellow-hover: #FCC521;
+  --tbank-black: #2C2C2C;
+  --tbank-gray: #6B6B6B;
+  --tbank-gray-light: #F8F7F5;
+  --tbank-gray-border: #E0D9D0;
+}
+
+body {
+  @apply antialiased;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  font-family: var(--font-inter), Inter, "Segoe UI", sans-serif;
+}
+
+/* Subtle background texture */
+body {
+  background-image: radial-gradient(circle at 1px 1px, rgba(45, 90, 123, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

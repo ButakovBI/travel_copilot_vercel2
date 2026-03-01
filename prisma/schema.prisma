@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  phone     String?  @unique
+  name      String?
+  region    String   @default("RU")
+  /// Кэшбэк на путешествия в текущем месяце (руб), показывается при бронировании
+  cashbackTravelCurrentMonthRub Float?
+  /// Синтетическая история покупок за последние месяцы (JSON) для персонального подбора
+  purchaseHistoryJson String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sessions      Session[]
+  paymentStats  PaymentStats?
+  pastTrips     PastTrip[]
+  cartItems     CartItem[]
+  conversations Conversation[]
+}
+
+model Conversation {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  messages Message[]
+}
+
+model Message {
+  id             String   @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role           String
+  content        String
+  offerCardsJson String?
+  createdAt      DateTime @default(now())
+}
+
+model PhoneVerificationCode {
+  id        String   @id @default(cuid())
+  phone     String
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String  @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model PaymentStats {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  avgMonthlySpendRub Float
+  restaurantSpendPct Float
+  travelSpendPct     Float
+  luxurySpendPct     Float
+  updatedAt     DateTime @updatedAt
+}
+
+model PastTrip {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  destination String
+  type        String
+  avgPriceRub Float
+  stars       Int?
+  createdAt   DateTime @default(now())
+}
+
+model Flight {
+  id            String   @id @default(cuid())
+  origin        String
+  destination   String
+  departureAt   String
+  arrivalAt     String
+  carrier       String
+  flightNumber  String
+  priceRub      Int
+  direct        Boolean
+  imageUrl      String?
+  availableSeats Int    @default(50)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Hotel {
+  id          String   @id @default(cuid())
+  city        String
+  name        String
+  stars       Int
+  pricePerNightRub Int
+  amenities   String
+  imageUrl    String?
+  availableRooms Int  @default(10)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Train {
+  id            String   @id @default(cuid())
+  origin        String
+  destination   String
+  departureAt   String
+  arrivalAt     String
+  carrier       String
+  priceRub      Int
+  availableSeats Int    @default(100)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  sessionId String?
+  type      String
+  offerId   String
+  payload   String
+  priceRub  Int
+  createdAt DateTime @default(now())
+}
+
+model VisaInfo {
+  id          String   @id @default(cuid())
+  countryCode String
+  countryName String
+  visaRequired Boolean
+  notes       String?
+}
+
+/// Черновик онбординга Copilot: параметры и опции при выходе/сохранении (сценарий 1, O5).
+model CopilotDraft {
+  id             String   @id @default(cuid())
+  userId         String?
+  sessionId      String?
+  conversationId String?
+  paramsJson     String
+  offerCardsJson String?
+  updatedAt      DateTime @updatedAt
+}
+
+/// Лог действий Copilot для питча и аналитики: учёт контекста, кэшбэка, трат, ответов.
+model CopilotActionLog {
+  id             String   @id @default(cuid())
+  userId         String?
+  sessionId      String?
+  conversationId String?
+  action         String
+  payloadJson    String?
+  createdAt      DateTime @default(now())
+}
